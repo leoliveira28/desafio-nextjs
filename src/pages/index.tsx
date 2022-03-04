@@ -49,9 +49,9 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
       first_publication_date: format(new Date(post.first_publication_date), 'dd MMM yyyy', {
         locale: ptBR,
       }),
-      title: RichText.asText(post.data.title),
-      subtitle: RichText.asText(post.data.subtitle),
-      author: RichText.asText(post.data.author),
+      title: post.data.title,
+      subtitle: post.data.subtitle,
+      author: post.data.author,
     }
   })
   
@@ -75,9 +75,9 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
           locale: ptBR,
         }),
         data: {
-          title: RichText.asText(post.data.title),
-          subtitle: RichText.asText(post.data.subtitle),
-          author: RichText.asText(post.data.author),
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
         },
       };
     });
@@ -171,6 +171,6 @@ export const getStaticProps: GetStaticProps = async ({ preview = false }) => {//
       preview,
 
     },
-    revalidate: 60 * 30, // 30 minutos
+    revalidate: 30 * 60, // 30 minutos
   };
 };

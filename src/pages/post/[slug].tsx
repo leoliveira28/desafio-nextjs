@@ -15,14 +15,14 @@ import Head from 'next/head';
 interface Post {
   first_publication_date: string | null;
   last_publication_date: string | null;
+  uid: string;
+
   data: {
-    title: {
-      text: string;
-    };
+    title: string;
+    subtitle: string;
     banner: {
       url: string;
     };
-
     author: string;
     content: {
       heading: string;
@@ -34,13 +34,35 @@ interface Post {
 }
 
 interface PostProps {
-  post: Post;
+  response: Post;
 }
 
-export default function Post({ post }: PostProps) {
-  const title = RichText.asText(post.data.title);
-  const author = RichText.asText(post.data.author);
+export default function Post({ response }: PostProps) {
+  /* const title = RichText.asText(post.data.title);
+  const author = RichText.asText(post.data.author); */
   //console.log(typeof post.data.title, post.data.author)
+
+  const post = {
+    uid: response.uid,
+    first_publication_date: response.first_publication_date,
+    data: {
+      title: response.data.title,
+      subtitle: response.data.subtitle,
+      author: response.data.author,
+      banner: {
+        url: response.data.banner.url,
+      },
+      content: response.data.content.map(content => {
+        return {
+          heading: content.heading,
+          body: [...content.body]
+        };
+      }),
+
+    },
+
+  };
+  
   const totalWords = post.data.content.reduce((total, contentItem) => {
     total += contentItem.heading.split(' ').length;
     const words = contentItem.body.map(item => item.text.split(' ').length);
@@ -71,7 +93,7 @@ export default function Post({ post }: PostProps) {
       <main className={commonStyles.container}>
         <div className={styles.post}>
           <div className={styles.postTop}>
-            <h1> {title}</h1>
+            <h1> {post.data.title}</h1>
             <ul>
               <li>
                 <FiUser />
@@ -133,7 +155,7 @@ export const getStaticProps: GetStaticProps = async context => {
   const { slug } = context.params;
   const response = await prismic.getByUID<any>('posts', String(slug), {});
    
-  const post = {
+  /* const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
     data: {
@@ -152,12 +174,12 @@ export const getStaticProps: GetStaticProps = async context => {
 
     },
 
-  };
+  }; */
   
 
   return {
     props: {
-      post,
+      response,
     },
   };
 };
