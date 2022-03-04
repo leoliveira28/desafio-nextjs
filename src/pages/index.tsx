@@ -37,7 +37,7 @@ interface HomeProps {
   postsPagination: PostPagination;
   posts: Post[];
 }
-export default function Home({ postsPagination }: HomeProps) {
+export default function Home({ postsPagination }: HomeProps): ReactElement {
   const formatedPosts = postsPagination.results.map(post => {
     return {
       ...post,
@@ -57,42 +57,41 @@ export default function Home({ postsPagination }: HomeProps) {
 
 
   async function handleNextPage(): Promise<void> {
-    if (currentPage !== 1 && nextPage !== null) {
+    if (currentPage !== 1 && nextPage === null) {
 
       return;
     }
     const postResponse = await fetch(`${nextPage}`).then(response => response.json());
-    setNextPage(postResponse.next_page)
-    setCurrentPage(postResponse.page)
-    const newPosts = postResponse.results.map(post => {
+    setNextPage(postResponse.next_page);
+    setCurrentPage(postResponse.page);
+    const newPosts = postResponse.results.map((post: Post) => {
       return {
         uid: post.uid,
         first_publication_date: format(new Date(post.first_publication_date), 'dd MMM yyyy', {
           locale: ptBR,
         }),
         data: {
-          title: RichText.asText(post.data.title),
-          subtitle: RichText.asText(post.data.subtitle),
-          author: RichText.asText(post.data.author),
+          title: post.data.title,
+          subtitle: post.data.subtitle,
+          author: post.data.author,
         },
       };
     });
 
     setPosts([...posts, ...newPosts]);
   }
-
   return (
     <>
 
       <Head>
         <title>SpaceTraveling</title>
       </Head>
-     <Header />
+      <Header />
 
       <main className={styles.container}>
         <div className={styles.posts}>
           {posts.map(post => (
-            <Link key={post.data.uid} href={`/posts/${post.data.uid}`}>
+            <Link key={post.uid} href={`/post/${post.uid}`}>
               <a href='#'>
                 <strong>{post.data.title}</strong>
                 <span>{post.data.subtitle}</span>
@@ -128,35 +127,39 @@ export default function Home({ postsPagination }: HomeProps) {
 
 }
 
-export const getStaticProps = async ({ preview = false }) => {//TODO
+export const getStaticProps: GetStaticProps = async ({ preview = false }) => {//TODO
   const prismic = getPrismicClient();
 
-  const postsResponse = await prismic.query<any>([
-    Prismic.predicates.at('document.type', 'posts')], {
-    fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
-    pageSize: 1,
-    orderings: '[document.last_publication_date desc]',
-
-  });//TODO
+  const postsResponse = await prismic.query<any>(
+    [Prismic.Predicates.at('document.type', 'posts')],
+    {
+      //fetch: ['posts.title', 'posts.subtitle', 'posts.author'],
+      pageSize: 1,
+      orderings: '[document.last_publication_date desc]',
+    }
+  );//TODO
 
   const posts = postsResponse.results.map(post => {
     return {
 
       uid: post.uid,
       first_publication_date: post.first_publication_date,
-
       data: {
         title: RichText.asText(post.data.title),
         subtitle: RichText.asText(post.data.subtitle),
         author: RichText.asText(post.data.author),
       },
-    }
-  })
+
+    };
+
+  });
+
 
   const postsPagination = {
     next_page: postsResponse.next_page,
     results: posts,
   };
+
   return {
 
     props: {
@@ -165,5 +168,5 @@ export const getStaticProps = async ({ preview = false }) => {//TODO
 
     },
     revalidate: 60 * 30, // 30 minutos
-  }
+  };
 };

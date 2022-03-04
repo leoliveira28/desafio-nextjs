@@ -53,10 +53,26 @@
         
               & + li {
                 margin-left: 1.625rem;
+                margin-bottom: 2rem;
               }
             }
           }
-        }
+
+          }
+          button {
+            margin-top: 2rem;
+            margin-bottom: 2rem;
+            border: none;
+            background: none;
+            color: #FF57B2;
+            font-size: bold;
+            cursor: pointer;
+            transition: 0.2s;
+
+            &:hover {
+              filter: brightness(0.8)
+            }
+          }
     }
 
     
