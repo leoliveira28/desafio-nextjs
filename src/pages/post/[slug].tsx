@@ -38,6 +38,8 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
+  const title = RichText.asText(post.data.title);
+  const author = RichText.asText(post.data.author);
   //console.log(typeof post.data.title, post.data.author)
   const totalWords = post.data.content.reduce((total, contentItem) => {
     total += contentItem.heading.split(' ').length;
@@ -62,14 +64,14 @@ export default function Post({ post }: PostProps) {
   return (
     <>
       <Head>
-        <title>{`${String(post.data.title)} | SpaceTraveling`}</title>
+        <title>{`${post.data.title} | SpaceTraveling`}</title>
       </Head>
       <Header />
       <img src={post.data.banner.url} alt="imagem" className={styles.banner} />
       <main className={commonStyles.container}>
         <div className={styles.post}>
           <div className={styles.postTop}>
-            <h1> {post.data.title}</h1>
+            <h1> {title}</h1>
             <ul>
               <li>
                 <FiUser />
@@ -130,14 +132,14 @@ export const getStaticProps: GetStaticProps = async context => {
   const prismic = getPrismicClient();
   const { slug } = context.params;
   const response = await prismic.getByUID<any>('posts', String(slug), {});
-
+   
   const post = {
     uid: response.uid,
     first_publication_date: response.first_publication_date,
     data: {
-      title: RichText.asText(response.data.title),
-      subtitle: RichText.asText(response.data.subtitle),
-      author: RichText.asText(response.data.author),
+      title: response.data.title,
+      subtitle: response.data.subtitle,
+      author: response.data.author,
       banner: {
         url: response.data.banner.url,
       },
@@ -151,7 +153,7 @@ export const getStaticProps: GetStaticProps = async context => {
     },
 
   };
-  console.log(post.data.title)
+  
 
   return {
     props: {

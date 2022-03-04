@@ -38,6 +38,7 @@ interface HomeProps {
   posts: Post[];
 }
 export default function Home({ postsPagination }: HomeProps): ReactElement {
+  
   const formatedPosts = postsPagination.results.map(post => {
     return {
       ...post,
@@ -47,13 +48,16 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
 
       first_publication_date: format(new Date(post.first_publication_date), 'dd MMM yyyy', {
         locale: ptBR,
-      })
+      }),
+      title: RichText.asText(post.data.title),
+      subtitle: RichText.asText(post.data.subtitle),
+      author: RichText.asText(post.data.author),
     }
   })
+  
   const [posts, setPosts] = useState<Post[]>(formatedPosts);
   const [nextPage, setNextPage] = useState(postsPagination.next_page);
   const [currentPage, setCurrentPage] = useState(1);
-
 
 
   async function handleNextPage(): Promise<void> {
@@ -71,9 +75,9 @@ export default function Home({ postsPagination }: HomeProps): ReactElement {
           locale: ptBR,
         }),
         data: {
-          title: post.data.title,
-          subtitle: post.data.subtitle,
-          author: post.data.author,
+          title: RichText.asText(post.data.title),
+          subtitle: RichText.asText(post.data.subtitle),
+          author: RichText.asText(post.data.author),
         },
       };
     });
@@ -139,31 +143,31 @@ export const getStaticProps: GetStaticProps = async ({ preview = false }) => {//
     }
   );//TODO
 
-  const posts = postsResponse.results.map(post => {
+  /* const posts = postsResponse.results.map(post => {
     return {
 
       uid: post.uid,
       first_publication_date: post.first_publication_date,
       data: {
-        title: RichText.asText(post.data.title),
-        subtitle: RichText.asText(post.data.subtitle),
-        author: RichText.asText(post.data.author),
+        title: post.data.title,
+        subtitle: post.data.subtitle,
+        author: post.data.author,
       },
 
     };
 
-  });
+  }); */
 
 
-  const postsPagination = {
+  /* const postsPagination = {
     next_page: postsResponse.next_page,
     results: posts,
-  };
+  }; */
 
   return {
 
     props: {
-      postsPagination,
+      postsPagination: postsResponse,
       preview,
 
     },
