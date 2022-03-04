@@ -34,25 +34,24 @@ interface Post {
 }
 
 interface PostProps {
-  response: Post;
+  post: Post;
+  uid: string;
+
 }
 
-export default function Post({ response }: PostProps) {
-  /* const title = RichText.asText(post.data.title);
-  const author = RichText.asText(post.data.author); */
-  //console.log(typeof post.data.title, post.data.author)
+export default function Post({ post }: PostProps) {
 
-  const post = {
-    uid: response.uid,
-    first_publication_date: response.first_publication_date,
+  const formatedPosts = {
+    uid: post.uid,
+    first_publication_date: post.first_publication_date,
     data: {
-      title: response.data.title,
-      subtitle: response.data.subtitle,
-      author: response.data.author,
+      title: post.data.title,
+      subtitle: post.data.subtitle,
+      author: post.data.author,
       banner: {
-        url: response.data.banner.url,
+        url: post.data.banner.url,
       },
-      content: response.data.content.map(content => {
+      content: post.data.content.map(content => {
         return {
           heading: content.heading,
           body: [...content.body]
@@ -136,6 +135,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const posts = await prismic.query([
     Prismic.Predicates.at('document.type', 'posts')
   ]);
+
   const paths = posts.results.map(post => {
     return {
       params: {
@@ -179,7 +179,7 @@ export const getStaticProps: GetStaticProps = async context => {
 
   return {
     props: {
-      response,
+      post: response,
     },
   };
 };
